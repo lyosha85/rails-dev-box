@@ -6,24 +6,36 @@ function install {
     apt-get -y install "$@" >/dev/null 2>&1
 }
 
-echo updating package information
-apt-add-repository -y ppa:brightbox/ruby-ng >/dev/null 2>&1
-apt-get -y update >/dev/null 2>&1
+# upgrade system
+apt-get update && sudo apt-get -y upgrade
 
-install 'development tools' build-essential
-
-install Ruby ruby2.2 ruby2.2-dev
-update-alternatives --set ruby /usr/bin/ruby2.2 >/dev/null 2>&1
-update-alternatives --set gem /usr/bin/gem2.2 >/dev/null 2>&1
-
-echo installing Bundler
-gem install bundler -N >/dev/null 2>&1
-
-install Git git
+install 'development tools' make build-essential libssl-dev libreadline6-dev zlib1g-dev libyaml-dev libc6-dev libcurl4-openssl-dev libksba8 libksba-dev libqtwebkit-dev
+install 'Headless requirements' xvfb
+install Git git git-core
 install SQLite sqlite3 libsqlite3-dev
 install memcached memcached
 install Redis redis-server
 install RabbitMQ rabbitmq-server
+
+# install rbenv and ruby-build
+sudo -u vagrant git clone git://github.com/sstephenson/rbenv.git /home/vagrant/.rbenv
+sudo -u vagrant echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> /home/vagrant/.profile
+sudo -u vagrant echo 'eval "$(rbenv init -)"' >> /home/vagrant/.profile
+sudo -u vagrant git clone git://github.com/sstephenson/ruby-build.git /home/vagrant/.rbenv/plugins/ruby-build
+
+# no rdoc for installed gems
+sudo -u vagrant echo 'gem: --no-ri --no-rdoc' >> /home/vagrant/.gemrc
+
+# install required ruby versions
+sudo -u vagrant -i rbenv install 2.2.3
+sudo -u vagrant -i rbenv global 2.2.3
+sudo -u vagrant -i ruby -v
+sudo -u vagrant -i gem install bundler --no-ri --no-rdoc
+sudo -u vagrant -i rbenv rehash
+
+echo installing Bundler
+gem install bundler -N >/dev/null 2>&1
+
 
 install PostgreSQL postgresql postgresql-contrib libpq-dev
 sudo -u postgres createuser --superuser vagrant
@@ -42,8 +54,10 @@ GRANT ALL PRIVILEGES ON activerecord_unittest2.* to 'rails'@'localhost';
 GRANT ALL PRIVILEGES ON inexistent_activerecord_unittest.* to 'rails'@'localhost';
 SQL
 
-install 'Nokogiri dependencies' libxml2 libxml2-dev libxslt1-dev
+install 'Nokogiri dependencies' libxml2 libxml2-dev libxslt1-dev libxslt-dev libqt4-dev imagemagick
+install 'Capybara dependencies' libqt4-dev
 install 'ExecJS runtime' nodejs
+install 'Other' imagemagick
 
 # Needed for docs generation.
 update-locale LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8
