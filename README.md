@@ -1,4 +1,4 @@
-# A Virtual Machine for Ruby on Rails Core Development
+# A Virtual Machine for Ruby on Rails Core Development 
 
 ## Introduction
 
@@ -39,7 +39,7 @@ Port 3000 in the host computer is forwarded to port 3000 in the virtual machine.
 
 * Git
 
-* Ruby 2.2
+* rbenv with ruby 2.2.3
 
 * Bundler
 
